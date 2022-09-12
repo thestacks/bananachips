@@ -1,0 +1,10 @@
+﻿@attribute [Authorize]
+@attribute [Route(FrontendRoutes.Companies.New)]
+@attribute [Route(FrontendRoutes.Companies.Edit)]
+
+<CompanyForm Id="@Id"/>
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+}

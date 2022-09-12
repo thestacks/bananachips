@@ -1,0 +1,40 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider IsDarkMode="@DarkModeEnabled"/>
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Color="Color.Primary" Elevation="0">
+        <MudImage Src="chips.png" Height="32"/>
+        <MudText Class="ml-3" Typo="Typo.h6">BananaChips</MudText>
+        <MudSpacer />
+        <MudIconButton Color="@Color.Inherit" Edge="Edge.End" Icon="@(DarkModeEnabled ? Icons.Filled.LightMode : Icons.Filled.DarkMode)" OnClick="@ToggleDarkMode"/>
+    </MudAppBar>
+    <MudDrawer @bind-Open="@DrawerOpen" Variant="DrawerVariant.Mini" Color="Color.Primary">
+        <MudDrawerHeader Dense="true" Style="padding: 5px;">
+            <MudIconButton Icon="@Icons.Filled.Menu" OnClick="@ToggleDrawer" Color="@Color.Inherit"/>
+        </MudDrawerHeader>
+        <NavigationMenu/>
+    </MudDrawer>
+    <MudMainContent>
+        <MudContainer Class="mt-5">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+@code {
+    private bool DrawerOpen { get; set; }
+    private bool DarkModeEnabled { get; set; } = true;
+    
+    void ToggleDrawer()
+    {
+        DrawerOpen = !DrawerOpen;
+    }
+
+    void ToggleDarkMode()
+    {
+        DarkModeEnabled = !DarkModeEnabled;
+    }
+
+}

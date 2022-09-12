@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>BananaChips.API</RootNamespace>
+        <UserSecretsId>1bca84dd-ec7c-4734-aecb-747e3b1a7d60</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\BananaChips.Application\BananaChips.Application.csproj" />
+      <ProjectReference Include="..\BananaChips.Infrastructure\BananaChips.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.1.1" />
+        <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="12.12.1" />
+        <PackageReference Include="HotChocolate.Data.EntityFramework" Version="12.12.1" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.7" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.7">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+      <PackageReference Include="HotChocolate.AspNetCore" Version="12.12.1" />
+    </ItemGroup>
+
+</Project>

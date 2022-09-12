@@ -1,0 +1,127 @@
+﻿<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" FullWidth="true" OnClick="OnAddButtonClick">Add</MudButton>
+<MudSpacer />
+<MudTable @ref="@Table" ServerData="LoadDataAsync">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Invoices</MudText>
+        <MudSpacer />
+        <MudSpacer/>
+        <MudTextField T="string" ValueChanged="OnSearchChange" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@(nameof(GetInvoicesQuery.Response.InvoiceListElement.Id))" T="GetInvoicesQuery.Response.InvoiceListElement">Id</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@nameof(GetInvoicesQuery.Response.InvoiceListElement.Name)" T="GetInvoicesQuery.Response.InvoiceListElement">Name</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@nameof(GetInvoicesQuery.Response.InvoiceListElement.PublishDate)" T="GetInvoicesQuery.Response.InvoiceListElement">Published at</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@nameof(GetInvoicesQuery.Response.InvoiceListElement.PaymentDate)" T="GetInvoicesQuery.Response.InvoiceListElement">Payment till</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@nameof(GetInvoicesQuery.Response.InvoiceListElement.NetValue)" T="GetInvoicesQuery.Response.InvoiceListElement">Net</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@nameof(GetInvoicesQuery.Response.InvoiceListElement.GrossValue)" T="GetInvoicesQuery.Response.InvoiceListElement">Gross</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@nameof(GetInvoicesQuery.Response.InvoiceListElement.Seller)" T="GetInvoicesQuery.Response.InvoiceListElement">Seller</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@nameof(GetInvoicesQuery.Response.InvoiceListElement.Buyer)" T="GetInvoicesQuery.Response.InvoiceListElement">Buyer</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            Actions
+        </MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="PublishDate">@context.PublishDate</MudTd>
+        <MudTd DataLabel="PaymentDate">@context.PaymentDate</MudTd>
+        <MudTd DataLabel="NetValue">@context.NetValue</MudTd>
+        <MudTd DataLabel="GrossValue">@context.GrossValue</MudTd>
+        <MudTd DataLabel="SellerName">@context.Seller.Name</MudTd>
+        <MudTd DataLabel="BuyerName">@context.Buyer.Name</MudTd>
+        <MudTd>
+            <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined" OverrideStyles="false">
+                <MudTooltip Text="Edit" Color="Color.Primary">
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="() => OnEditButtonClick(context.Id)" Color="Color.Primary" Variant="Variant.Outlined"/>
+                </MudTooltip>
+                <MudTooltip Text="Delete" Color="Color.Secondary">
+                    <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" Color="Color.Secondary" Variant="Variant.Outlined" OnClick="() => OnDeleteButtonClickAsync(context.Id, context.Name)"/>
+                </MudTooltip>
+            </MudButtonGroup>
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>There is no data yet...</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        Loading...
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager/>
+    </PagerContent>
+</MudTable>
+
+@code {
+
+    private MudTable<GetInvoicesQuery.Response.InvoiceListElement> Table;
+    private IEnumerable<GetInvoicesQuery.Response.InvoiceListElement> Items;
+    private int TotalItems;
+    private string SearchText;
+    [Inject] private IBackendConnector BackendConnector { get; set; }
+    [Inject] private NavigationManager NavigationManager { get; set; }
+    [Inject] private IDialogService DialogService { get; set; }
+
+    private async Task<TableData<GetInvoicesQuery.Response.InvoiceListElement>> LoadDataAsync(TableState tableState)
+    {
+        var pagination = tableState.CalculatePagination();
+        var request = new GetInvoicesQuery.Request(pagination.Skip, pagination.Take, SearchText, tableState.SortLabel, tableState.SortDirection);
+        var result = await BackendConnector.SendQueryAsync<GetInvoicesQuery.Response>(request.Query, request.OperationName, request);
+        return new TableData<GetInvoicesQuery.Response.InvoiceListElement> { TotalItems = result.Data.Invoices.TotalCount, Items = result.Data.Invoices.Items };
+    }
+
+    private void OnSearchChange(string searchKeyword)
+    {
+        SearchText = searchKeyword;
+        Table.ReloadServerData();
+    }
+
+    private void OnAddButtonClick()
+    {
+        NavigationManager.NavigateTo(FrontendRoutes.Invoices.New);
+    }
+
+    private void OnEditButtonClick(int id)
+    {
+        // NavigationManager.NavigateTo(FrontendRoutes.GetRouteWithParameter(FrontendRoutes.Companies.Edit, id));
+    }
+
+    private async Task OnDeleteButtonClickAsync(int id, string name)
+    {
+        // var parameters = new DialogParameters
+        // {
+        //     { nameof(DynamicDialog.ContentText), $"Are you sure, that you want to remove company '{name}'?" },
+        //     { nameof(DynamicDialog.ButtonText), "Delete" },
+        //     { nameof(DynamicDialog.Color), Color.Error }
+        // };
+        // var dialogOptions = new DialogOptions { CloseButton = false };
+        // var dialog = DialogService.Show<DynamicDialog>("Confirm delete operation", parameters, dialogOptions);
+        // var dialogResult = await dialog.Result;
+        // if (dialogResult.Cancelled)
+        // {
+        //     return;
+        // }
+        //
+        // var request = new DeleteCompanyMutation.Request(id);
+        // var response = await CompanyClient.SendMutationAsync<DeleteCompanyMutation.Response>(request.Query, request.OperationName, request);
+        // if (response.IsSuccess)
+        // {
+        //     await Table.ReloadServerData();
+        // }
+    }
+}

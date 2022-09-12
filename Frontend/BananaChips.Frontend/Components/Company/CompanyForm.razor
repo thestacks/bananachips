@@ -1,0 +1,134 @@
+﻿<MudCard>
+    <MudForm Model="@Model" @ref="@Form" Validation="@Validator.ValidationSummary">
+        <MudCardHeader Class="justify-center">
+            <CardHeaderContent>
+                <MudText Typo="Typo.h5">Add new company</MudText>
+            </CardHeaderContent>
+            <CardHeaderActions>
+                <MudTooltip Text="Go back to list of companies">
+                    <MudIconButton Color="Color.Primary" Variant="Variant.Outlined" Icon="@Icons.Filled.List" OnClick="GoBackToList"/>
+                </MudTooltip>
+            </CardHeaderActions>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudTextField @bind-Value="@Model.Name" For="@(() => Model.Name)" Immediate="true" Label="Name" InputType="InputType.Text" />
+            <MudTextField @bind-Value="@Model.Identifier" For="@(() => Model.Identifier)" Immediate="true" Label="Identifier" InputType="InputType.Text" />
+            <MudTextField @bind-Value="@Model.AddressLine" For="@(() => Model.AddressLine)" Immediate="true" Label="Address Line" InputType="InputType.Text" />
+            <MudGrid Justify="Justify.Center" Spacing="1">
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="@Model.AddressZipCode" For="@(() => Model.AddressZipCode)" Immediate="true" Label="Zip Code" InputType="InputType.Text" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="@Model.AddressCity" For="@(() => Model.AddressCity)" Immediate="true" Label="City" InputType="InputType.Text" />
+                </MudItem>
+            </MudGrid>
+            <MudTextField @bind-Value="@Model.AddressCountry" For="@(() => Model.AddressCountry)" Immediate="true" Label="Country" InputType="InputType.Text" />
+        </MudCardContent>
+        <MudCardActions Class="text-center">
+            <MudButton Class="mr-auto ml-auto" StartIcon="@(IsEdit ? Icons.Filled.Update : Icons.Filled.Add)" Variant="Variant.Filled" Color="Color.Primary"  OnClick="@(async () => await Submit())">
+                @(IsEdit ? "Update" : "Create")
+            </MudButton>
+        </MudCardActions>
+    </MudForm>
+</MudCard>
+
+@code {
+    public class CompanyFormModel
+    {
+        public int? Id { get; set; }
+        public string Name { get; set; }
+        public string Identifier { get; set; }
+        public string AddressLine { get; set; }
+        public string AddressCity { get; set; }
+        public string AddressZipCode { get; set; }
+        public string AddressCountry { get; set; }
+    }
+
+    public class CompanyFormModelValidator : AbstractValidator<CompanyFormModel>
+    {
+        public CompanyFormModelValidator()
+        {
+            RuleFor(r => r.Name).NotEmpty();
+            RuleFor(r => r.Identifier).CompanyIdentifier().WithMessage("Company identifier should be in Polish NIP format.");
+            RuleFor(r => r.AddressLine).NotEmpty();
+            RuleFor(r => r.AddressCity).NotEmpty();
+            RuleFor(r => r.AddressCountry).NotEmpty();
+            RuleFor(r => r.AddressZipCode).ZipCode().WithMessage("Zip Code should be in Polish Zip Code format (e.g. 11-222).");
+        }
+        
+        public Func<object, string, Task<IEnumerable<string>>> ValidationSummary => async (model, propertyName) =>
+        {
+            var result = await ValidateAsync(ValidationContext<CompanyFormModel>.CreateWithOptions((CompanyFormModel)model, x => x.IncludeProperties(propertyName)));
+            return result.IsValid ? Array.Empty<string>() : result.Errors.Select(e => e.ErrorMessage);
+        };
+    }
+
+    [Parameter]
+    public int? Id { get; set; }
+
+    public bool IsEdit => Id.HasValue;
+    private CompanyFormModel Model = new();
+    private CompanyFormModelValidator Validator = new();
+    private MudForm Form;
+    [Inject] private IBackendConnector BackendConnector { get; set; }
+    [Inject] private NavigationManager NavigationManager { get; set; }
+    [Inject] private INotificationService NotificationService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Id.HasValue)
+            return;
+        
+        var request = new GetCompanyQuery.Request(Id.Value);
+        var response = await BackendConnector.SendQueryAsync<GetCompanyQuery.Response>(request.Query, request.OperationName, request);
+        if (response.IsSuccess)
+        {
+            var company = response.Data.Companies.Items.SingleOrDefault();
+            if (company == null)
+            {
+                NotificationService.ShowError("Company could not be edited - it does not exist!");
+                NavigationManager.NavigateTo(FrontendRoutes.Companies.List);
+                return;
+            }
+
+            Model = new CompanyFormModel
+            {
+                Id = company.Id,
+                Name = company.Name,
+                Identifier = company.Identifier,
+                AddressCity = company.Address.City,
+                AddressCountry = company.Address.Country,
+                AddressLine = company.Address.Line,
+                AddressZipCode = company.Address.ZipCode
+            };
+        }
+    }
+
+    public async Task Submit()
+    {
+        try
+        {
+            await Form.Validate();
+            if (!Form.IsValid)
+                return;
+
+            var data = Form.Model as CompanyFormModel;
+            var request = new UpsertCompanyMutation.Request(data!);
+            var response = await BackendConnector.SendMutationAsync<UpsertCompanyMutation.Response.Wrapper>(request.Query, request.OperationName, request);
+            if (response.IsSuccess)
+            {
+                NotificationService.ShowSuccess(IsEdit ? $"Successfully updated company '{data.Name}'" : $"Successfully created new company - '{data.Name}'");
+                NavigationManager.NavigateTo(FrontendRoutes.Companies.List);
+            }
+        }
+        catch
+        {
+            return;
+        }
+    }
+
+    public void GoBackToList()
+    {
+        NavigationManager.NavigateTo(FrontendRoutes.Companies.List);
+    }
+}

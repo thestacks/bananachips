@@ -1,0 +1,21 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider IsDarkMode="@DarkModeEnabled"/>
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Small">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+@code {
+    private bool DarkModeEnabled { get; set; } = true;
+    
+    void ToggleDarkMode()
+    {
+        DarkModeEnabled = !DarkModeEnabled;
+    }
+}
