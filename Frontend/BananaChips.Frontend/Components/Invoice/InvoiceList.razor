@@ -57,10 +57,10 @@
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        <MudText>There is no data yet...</MudText>
+        <MudText>There are no invoices.</MudText>
     </NoRecordsContent>
     <LoadingContent>
-        Loading...
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
     </LoadingContent>
     <PagerContent>
         <MudTablePager/>
@@ -73,9 +73,15 @@
     private IEnumerable<GetInvoicesQuery.Response.InvoiceListElement> Items;
     private int TotalItems;
     private string SearchText;
-    [Inject] private IBackendConnector BackendConnector { get; set; }
-    [Inject] private NavigationManager NavigationManager { get; set; }
-    [Inject] private IDialogService DialogService { get; set; }
+
+    [Inject]
+    private IBackendConnector BackendConnector { get; set; }
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+
+    [Inject]
+    private IDialogService DialogService { get; set; }
 
     private async Task<TableData<GetInvoicesQuery.Response.InvoiceListElement>> LoadDataAsync(TableState tableState)
     {
@@ -98,30 +104,31 @@
 
     private void OnEditButtonClick(int id)
     {
-        // NavigationManager.NavigateTo(FrontendRoutes.GetRouteWithParameter(FrontendRoutes.Companies.Edit, id));
+    // NavigationManager.NavigateTo(FrontendRoutes.GetRouteWithParameter(FrontendRoutes.Companies.Edit, id));
     }
 
     private async Task OnDeleteButtonClickAsync(int id, string name)
     {
-        // var parameters = new DialogParameters
-        // {
-        //     { nameof(DynamicDialog.ContentText), $"Are you sure, that you want to remove company '{name}'?" },
-        //     { nameof(DynamicDialog.ButtonText), "Delete" },
-        //     { nameof(DynamicDialog.Color), Color.Error }
-        // };
-        // var dialogOptions = new DialogOptions { CloseButton = false };
-        // var dialog = DialogService.Show<DynamicDialog>("Confirm delete operation", parameters, dialogOptions);
-        // var dialogResult = await dialog.Result;
-        // if (dialogResult.Cancelled)
-        // {
-        //     return;
-        // }
-        //
-        // var request = new DeleteCompanyMutation.Request(id);
-        // var response = await CompanyClient.SendMutationAsync<DeleteCompanyMutation.Response>(request.Query, request.OperationName, request);
-        // if (response.IsSuccess)
-        // {
-        //     await Table.ReloadServerData();
-        // }
+        var parameters = new DialogParameters
+        {
+            { nameof(DynamicDialog.Text), $"Are you sure, that you want to delete invoice '{name}'? This operation will delete the invoice together with all lines inside." },
+            { nameof(DynamicDialog.ButtonText), "Delete" },
+            { nameof(DynamicDialog.Color), Color.Error }
+        };
+        var dialogOptions = new DialogOptions { CloseButton = false };
+        var dialog = DialogService.Show<DynamicDialog>("Confirm delete operation", parameters, dialogOptions);
+        var dialogResult = await dialog.Result;
+        if (dialogResult.Cancelled)
+        {
+            return;
+        }
+
+        var request = new DeleteInvoiceMutation.Request(id);
+        var response = await BackendConnector.SendMutationAsync<DeleteInvoiceMutation.Response>(request.Query, request.OperationName, request);
+        if (response.IsSuccess)
+        {
+            await Table.ReloadServerData();
+        }
     }
+
 }

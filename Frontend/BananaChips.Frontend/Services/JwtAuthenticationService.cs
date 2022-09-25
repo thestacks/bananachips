@@ -1,11 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text.Json;
 using BananaChips.Frontend.Constants;
-using BananaChips.Frontend.GraphQL.Operations;
 using BananaChips.Frontend.GraphQL.Operations.Mutations;
-using BananaChips.Frontend.GraphQL.Requests;
-using BananaChips.Frontend.GraphQL.Responses;
 using BananaChips.Frontend.Services.Meta;
 using Blazored.LocalStorage;
 using Microsoft.IdentityModel.Tokens;

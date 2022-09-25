@@ -4,7 +4,6 @@ using BananaChips.Frontend.GraphQL.Responses;
 using BananaChips.Frontend.Services.Meta;
 using Blazored.LocalStorage;
 using GraphQL;
-using GraphQL.Client.Abstractions;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.SystemTextJson;
 

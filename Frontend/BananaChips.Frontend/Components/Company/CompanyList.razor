@@ -37,10 +37,10 @@
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        <MudText>There is no data yet...</MudText>
+        <MudText>There are no companies.</MudText>
     </NoRecordsContent>
     <LoadingContent>
-        Loading...
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
     </LoadingContent>
     <PagerContent>
         <MudTablePager/>
@@ -85,7 +85,7 @@
     {
         var parameters = new DialogParameters
         {
-            { nameof(DynamicDialog.ContentText), $"Are you sure, that you want to remove company '{name}'?" },
+            { nameof(DynamicDialog.Text), $"Are you sure, that you want to remove company '{name}'?" },
             { nameof(DynamicDialog.ButtonText), "Delete" },
             { nameof(DynamicDialog.Color), Color.Error }
         };

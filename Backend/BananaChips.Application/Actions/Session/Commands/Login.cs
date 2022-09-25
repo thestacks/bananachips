@@ -19,7 +19,6 @@ public class Login
     {
         public CommandValidator()
         {
-            
             RuleFor(r => r.Email).EmailAddress().WithErrorCode(ValidationErrorCode.INVALID_EMAIL);
             RuleFor(r => r.Password).NotEmpty().WithErrorCode(ValidationErrorCode.MISSING_REQUIRED_FIELDS);
         }

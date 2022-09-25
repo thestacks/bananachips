@@ -1,7 +1,6 @@
 ﻿using BananaChips.Application.Actions.Invoices.Queries;
 using BananaChips.Domain.Entities;
 using HotChocolate.AspNetCore.Authorization;
-using HotChocolate.Data.Sorting;
 using MediatR;
 
 namespace BananaChips.API.Queries;

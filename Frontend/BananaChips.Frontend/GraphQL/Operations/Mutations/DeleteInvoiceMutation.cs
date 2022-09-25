@@ -2,7 +2,7 @@
 
 namespace BananaChips.Frontend.GraphQL.Operations.Mutations;
 
-public class DeleteCompanyMutation
+public class DeleteInvoiceMutation
 {
     public class Request : IGraphQLRequestBase
     {
@@ -13,13 +13,13 @@ public class DeleteCompanyMutation
             Id = id;
         }
     
-        public string Query => $@"mutation {OperationName}($id: Int!) {{
-  deleteCompany(input: {{ id: $id }}) {{
+        public string Query => $@"mutation {OperationName}($id: Long!) {{
+  deleteInvoice(input: {{ id: $id }}) {{
     success
   }}
 }}";
 
-        public string OperationName => "DeleteCompany";
+        public string OperationName => "DeleteInvoice";
     }
     
     public class Response
@@ -28,7 +28,7 @@ public class DeleteCompanyMutation
         
         public class Wrapper
         {
-            public Response DeleteCompany { get; set; }
+            public Response DeleteInvoice { get; set; }
         }
     }
 }

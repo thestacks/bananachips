@@ -9,6 +9,7 @@ public class GetInvoicesQuery
 {
     public class Request : IGraphQLRequestBase
     {
+        private static readonly List<string> NestedSortFields = new() { "seller", "buyer" }; 
         public int Skip { get; }
         public int Take { get; }
         private string? SortField { get; }
@@ -21,7 +22,7 @@ public class GetInvoicesQuery
             Skip = skip;
             Take = take;
             SearchText = searchText ?? string.Empty;
-            SortField = sortField;
+            SortField = sortField?.ToLower();
             SortDirection = sortDirection == MudBlazor.SortDirection.None ? null :
                 sortDirection == MudBlazor.SortDirection.Ascending ? "ASC" : "DESC";
         }
@@ -33,8 +34,12 @@ public class GetInvoicesQuery
             {
                 if (SortField != null && SortDirection != null)
                 {
-                    return QueryWithSort.Replace("$sortField", SortField.ToLower()).Replace("$sortDirection",
-                        SortDirection);
+                    if (!NestedSortFields.Contains(SortField))
+                        return QueryWithSort.Replace("$sortField", SortField.ToLower()).Replace("$sortDirection",
+                            SortDirection);
+
+                    return QueryWithSort.Replace("$sortField: $sortDirection",
+                        $"{SortField}: {{ name: {SortDirection} }}");
                 }
 
                 return QueryWithoutSort;

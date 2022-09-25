@@ -1,4 +1,2 @@
-﻿using BananaChips.Frontend.Components.Company;
-
-namespace BananaChips.Frontend.GraphQL.Requests;
+﻿namespace BananaChips.Frontend.GraphQL.Requests;
 
