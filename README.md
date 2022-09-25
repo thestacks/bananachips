@@ -26,6 +26,7 @@ Great look of the app is done by using [MudBlazor](https://mudblazor.com/) desig
 
 In order to launch solution in debugging mode do the following:
 1. Setup MSSQL database instance.
-2. Go to `BananaChips.API/appsettings.Development.json` file and provide required settings values.
+2. Go to `Backend/BananaChips.API/appsettings.Development.json` file and provide required settings values.
 3. Debug Backend - at first start, app is going to create database, apply migrations and create default user automatically.
-4. Debug Frontend - after starting backend, it will be possible to interact with it by using the Frontend app.
+4. Go to `Frontend/BananaChips.Frontend` in shell, and run the command: `dotnet run`
+5. After starting backend, it will be possible to interact with it by using the Frontend app.
