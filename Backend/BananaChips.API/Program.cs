@@ -8,7 +8,11 @@ using BananaChips.Infrastructure;
 using HotChocolate.AspNetCore.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Configuration.AddUserSecrets(Assembly.GetCallingAssembly());
+#if DEBUG
+builder.Configuration.AddJsonFile("appsettings.Development.json");
+#else
+builder.Configuration.AddEnvironmentVariables();
+#endif
 builder.Services
     .AddInfrastructure(builder.Configuration)
     .AddApplication()
